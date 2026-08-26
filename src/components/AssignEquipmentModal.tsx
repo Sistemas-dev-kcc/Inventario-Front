@@ -32,6 +32,10 @@ function AssignEquipmentModal({
   const [error, setError] =
     useState("");
 
+  // ==================================================
+  // INICIALIZAR MODAL
+  // ==================================================
+
   useEffect(() => {
 
     if (!isOpen) {
@@ -49,6 +53,30 @@ function AssignEquipmentModal({
 
   }, [isOpen, equipment]);
 
+  // ==================================================
+  // BUSCAR USUARIOS
+  // ==================================================
+
+  useEffect(() => {
+
+    if (!isOpen) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      loadUsers(search);
+    }, 300);
+
+    return () => {
+      clearTimeout(timeout);
+    };
+
+  }, [search, isOpen]);
+
+  // ==================================================
+  // CARGAR USUARIOS
+  // ==================================================
+
   async function loadUsers(
     searchValue: string
   ) {
@@ -56,13 +84,15 @@ function AssignEquipmentModal({
     try {
 
       setLoadingUsers(true);
+      setError("");
 
       const endpoint = searchValue.trim()
-        ? `/users?search=${encodeURIComponent(searchValue)}`
+        ? `/users?search=${encodeURIComponent(searchValue.trim())}`
         : "/users";
 
       const data = await api<User[]>(endpoint);
 
+      // Solo usuarios activos
       setUsers(
         data.filter((user) => user.active)
       );
@@ -82,6 +112,10 @@ function AssignEquipmentModal({
     }
   }
 
+  // ==================================================
+  // ASIGNAR / DESASIGNAR
+  // ==================================================
+
   async function handleAssign() {
 
     if (!equipment) {
@@ -93,6 +127,10 @@ function AssignEquipmentModal({
       setLoading(true);
       setError("");
 
+      // ==========================================
+      // DESASIGNAR
+      // ==========================================
+
       if (!selectedUserId) {
 
         await api(
@@ -102,7 +140,13 @@ function AssignEquipmentModal({
           }
         );
 
-      } else {
+      }
+
+      // ==========================================
+      // ASIGNAR
+      // ==========================================
+
+      else {
 
         await api(
           `/equipment/${equipment.id}/assign`,
@@ -124,7 +168,7 @@ function AssignEquipmentModal({
       setError(
         error instanceof Error
           ? error.message
-          : "No se pudo asignar el equipo."
+          : "No se pudo actualizar la asignación."
       );
 
     } finally {
@@ -141,20 +185,34 @@ function AssignEquipmentModal({
   return (
     <div
       className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+      onMouseDown={(e) => {
+
+        if (
+          e.target === e.currentTarget &&
+          !loading
+        ) {
+          onClose();
+        }
+
+      }}
     >
 
       <div className="bg-white w-full max-w-lg rounded-xl shadow-xl">
 
-        {/* HEADER */}
+        {/* ==================================================
+            HEADER
+        ================================================== */}
 
         <div className="flex items-center justify-between px-6 py-4 border-b">
 
           <div>
 
             <h2 className="text-lg font-semibold">
+
               {equipment.user
                 ? "Cambiar usuario"
                 : "Asignar equipo"}
+
             </h2>
 
             <p className="text-sm text-gray-500 mt-1">
@@ -164,53 +222,75 @@ function AssignEquipmentModal({
           </div>
 
           <button
+            type="button"
             onClick={onClose}
             disabled={loading}
-            className="text-gray-400 hover:text-gray-700 text-xl"
+            className="text-gray-400 hover:text-gray-700 text-xl disabled:opacity-50"
           >
             ×
           </button>
 
         </div>
 
-        {/* BODY */}
+        {/* ==================================================
+            BODY
+        ================================================== */}
 
         <div className="p-6">
 
+          {/* ERROR */}
+
           {error && (
+
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
               {error}
             </div>
+
           )}
 
+          {/* BUSCADOR */}
+
           <label className="block text-sm font-medium mb-2">
-            Buscar usuario
+            Buscar usuario por nombre
           </label>
 
           <input
+            type="text"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              loadUsers(e.target.value);
             }}
-            placeholder="Nombre o email..."
-            className="w-full px-4 py-2.5 border rounded-lg outline-none focus:ring-2 focus:ring-slate-300"
+            placeholder="Escribe el nombre del usuario..."
+            autoFocus
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-slate-300"
           />
+
+          {/* RESULTADOS */}
 
           <div className="mt-4 max-h-64 overflow-y-auto border rounded-lg">
 
+            {/* CARGANDO */}
+
             {loadingUsers && (
-              <p className="p-4 text-sm text-gray-500">
-                Cargando usuarios...
+
+              <p className="p-4 text-sm text-gray-500 text-center">
+                Buscando usuarios...
               </p>
+
             )}
+
+            {/* USUARIOS */}
 
             {!loadingUsers &&
               users.map((user) => (
 
                 <label
                   key={user.id}
-                  className="flex items-center gap-3 p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                  className={`flex items-center gap-3 p-4 border-b last:border-b-0 cursor-pointer transition ${
+                    selectedUserId === user.id
+                      ? "bg-gray-100"
+                      : "hover:bg-gray-50"
+                  }`}
                 >
 
                   <input
@@ -220,21 +300,19 @@ function AssignEquipmentModal({
                     checked={
                       selectedUserId === user.id
                     }
-                    onChange={(e) =>
-                      setSelectedUserId(
-                        e.target.value
-                      )
+                    onChange={() =>
+                      setSelectedUserId(user.id)
                     }
                   />
 
-                  <div>
+                  <div className="min-w-0">
 
-                    <p className="text-sm font-medium">
+                    <p className="text-sm font-medium text-gray-900">
                       {user.name}
                     </p>
 
                     <p className="text-xs text-gray-500">
-                      {user.email}
+                      {user.department || "Sin departamento"}
                     </p>
 
                   </div>
@@ -243,49 +321,66 @@ function AssignEquipmentModal({
 
               ))}
 
+            {/* SIN RESULTADOS */}
+
             {!loadingUsers &&
               users.length === 0 && (
+
                 <p className="p-4 text-sm text-gray-500 text-center">
-                  No se encontraron usuarios.
+                  {search.trim()
+                    ? "No se encontraron usuarios con ese nombre."
+                    : "No hay usuarios activos."}
                 </p>
+
               )}
 
           </div>
 
+          {/* DESASIGNAR */}
+
           {equipment.user && (
+
             <button
               type="button"
               onClick={() => setSelectedUserId("")}
-              className="mt-4 text-sm text-red-600 hover:text-red-800"
+              disabled={loading}
+              className="mt-4 text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
             >
               Desasignar equipo
             </button>
+
           )}
 
         </div>
 
-        {/* FOOTER */}
+        {/* ==================================================
+            FOOTER
+        ================================================== */}
 
         <div className="flex justify-end gap-3 px-6 py-4 border-t">
 
           <button
+            type="button"
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2.5 rounded-lg border hover:bg-gray-50"
+            className="px-4 py-2.5 rounded-lg border hover:bg-gray-50 disabled:opacity-50"
           >
             Cancelar
           </button>
 
           <button
+            type="button"
             onClick={handleAssign}
-            disabled={loading}
+            disabled={loading || !selectedUserId && !equipment.user}
             className="px-4 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
           >
+
             {loading
               ? "Guardando..."
               : selectedUserId
                 ? "Asignar"
                 : "Desasignar"}
+
           </button>
 
         </div>

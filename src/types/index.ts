@@ -1,10 +1,12 @@
+
 // ==========================================
 // EQUIPMENT STATUS
 // ==========================================
 
 export type EquipmentStatus =
     | "ACTIVO"
-    | "ALMACEN";
+    | "ALMACEN"
+    | "BAJA";
 
 
 // ==========================================
@@ -22,13 +24,12 @@ export type EquipmentType =
 // ==========================================
 
 export interface User {
+
     id: string;
 
     name: string;
 
-    email: string;
-
-    department?: string | null;
+    department: string;
 
     position?: string | null;
 
@@ -49,6 +50,8 @@ export interface User {
 export interface Equipment {
 
     id: string;
+
+    email?: string | null;
 
     ip: string;
 
@@ -96,17 +99,35 @@ export interface DashboardData {
 
     users: {
         total: number;
+
         active: number;
+
         inactive: number;
     };
 
     equipment: {
+
+        // Total de equipos registrados
         total: number;
 
+        // Equipos asignados y activos
         assigned: number;
 
+        // Equipos disponibles
+        warehouse: number;
+
+        // Equipos dados de baja
+        retired: number;
+
+        // Total de equipos que no están dados de baja
         available: number;
 
-        warehouse: number;
+        // Porcentajes
+        assignedPercentage: number;
+
+        warehousePercentage: number;
+
+        retiredPercentage: number;
     };
 }
+

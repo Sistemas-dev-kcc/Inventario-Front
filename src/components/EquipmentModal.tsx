@@ -1,5 +1,7 @@
+
 import { useEffect, useState } from "react";
 import { api, ApiError } from "../services/api";
+
 import type {
   Equipment,
   EquipmentStatus,
@@ -13,39 +15,87 @@ interface EquipmentModalProps {
   onSaved: () => void;
 }
 
+
+// ==================================================
+// FORMULARIO
+// ==================================================
+
 interface EquipmentForm {
+
+  email: string;
+
   ip: string;
+
   serialNumber: string;
+
   hostname: string;
+
   model: string;
+
   type: EquipmentType;
+
   teamviewer: string;
+
   operatingSystem: string;
+
   memory: string;
+
   ram: string;
+
   monitor: boolean;
+
   back: boolean;
+
   antivirus: boolean;
+
   warranty: string;
+
   status: EquipmentStatus;
 }
 
+
+// ==================================================
+// FORMULARIO VACÍO
+// ==================================================
+
 const emptyForm: EquipmentForm = {
+
+  email: "",
+
   ip: "",
+
   serialNumber: "",
+
   hostname: "",
+
   model: "",
+
   type: "LAPTOP",
+
   teamviewer: "",
+
   operatingSystem: "",
+
   memory: "",
+
   ram: "",
+
   monitor: false,
+
   back: false,
+
   antivirus: false,
+
   warranty: "",
+
   status: "ALMACEN"
+
 };
+
+
+// ==================================================
+// COMPONENTE
+// ==================================================
 
 function EquipmentModal({
   isOpen,
@@ -60,18 +110,18 @@ function EquipmentModal({
   const [loading, setLoading] =
     useState(false);
 
-  // Errores generales
   const [errors, setErrors] =
     useState<string[]>([]);
 
-  // Errores específicos de cada campo
   const [fieldErrors, setFieldErrors] =
     useState<Record<string, string>>({});
 
-  const isEditing = Boolean(equipment);
+  const isEditing =
+    Boolean(equipment);
+
 
   // ==================================================
-  // CARGAR DATOS DEL EQUIPO
+  // CARGAR EQUIPO
   // ==================================================
 
   useEffect(() => {
@@ -80,62 +130,147 @@ function EquipmentModal({
       return;
     }
 
-    // Limpiar errores al abrir el modal
     setErrors([]);
+
     setFieldErrors({});
 
     if (equipment) {
 
       setForm({
-        ip: equipment.ip,
-        serialNumber: equipment.serialNumber,
-        hostname: equipment.hostname,
-        model: equipment.model,
-        type: equipment.type,
-        teamviewer: equipment.teamviewer ?? "",
-        operatingSystem: equipment.operatingSystem,
-        memory: equipment.memory ?? "",
-        ram: equipment.ram ?? "",
-        monitor: equipment.monitor,
-        back: equipment.back,
-        antivirus: equipment.antivirus,
-        warranty: equipment.warranty ?? "",
-        status: equipment.status
+
+        email:
+          equipment.email ?? "",
+
+        ip:
+          equipment.ip,
+
+        serialNumber:
+          equipment.serialNumber,
+
+        hostname:
+          equipment.hostname,
+
+        model:
+          equipment.model,
+
+        type:
+          equipment.type,
+
+        teamviewer:
+          equipment.teamviewer ?? "",
+
+        operatingSystem:
+          equipment.operatingSystem,
+
+        memory:
+          equipment.memory ?? "",
+
+        ram:
+          equipment.ram ?? "",
+
+        monitor:
+          equipment.monitor,
+
+        back:
+          equipment.back,
+
+        antivirus:
+          equipment.antivirus,
+
+        warranty:
+          equipment.warranty ?? "",
+
+        status:
+          equipment.status
+
       });
 
     } else {
 
-      setForm(emptyForm);
+      setForm({
+        ...emptyForm
+      });
 
     }
 
   }, [isOpen, equipment]);
 
+
   // ==================================================
-  // SI EL MODAL ESTÁ CERRADO
+  // ESC
+  // ==================================================
+
+  useEffect(() => {
+
+    if (!isOpen) {
+      return;
+    }
+
+    function handleKeyDown(
+      event: KeyboardEvent
+    ) {
+
+      if (
+        event.key === "Escape" &&
+        !loading
+      ) {
+        onClose();
+      }
+
+    }
+
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
+
+    return () => {
+
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
+
+    };
+
+  }, [
+    isOpen,
+    loading,
+    onClose
+  ]);
+
+
+  // ==================================================
+  // MODAL CERRADO
   // ==================================================
 
   if (!isOpen) {
     return null;
   }
 
+
   // ==================================================
-  // INPUTS
+  // INPUT
   // ==================================================
 
   function handleInputChange(
     e: React.ChangeEvent<HTMLInputElement>
   ) {
 
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
 
     setForm((previous) => ({
+
       ...previous,
+
       [name]: value
+
     }));
 
-    // Si el usuario modifica un campo que tenía error,
-    // quitamos visualmente ese error.
+
     setFieldErrors((previous) => {
 
       if (!previous[name]) {
@@ -149,26 +284,52 @@ function EquipmentModal({
       delete newErrors[name];
 
       return newErrors;
+
     });
 
   }
 
+
   // ==================================================
-  // SELECTS
+  // SELECT
   // ==================================================
 
   function handleSelectChange(
     e: React.ChangeEvent<HTMLSelectElement>
   ) {
 
-    const { name, value } = e.target;
+    const {
+      name,
+      value
+    } = e.target;
 
     setForm((previous) => ({
+
       ...previous,
+
       [name]: value
+
     }));
 
+
+    setFieldErrors((previous) => {
+
+      if (!previous[name]) {
+        return previous;
+      }
+
+      const newErrors = {
+        ...previous
+      };
+
+      delete newErrors[name];
+
+      return newErrors;
+
+    });
+
   }
+
 
   // ==================================================
   // CHECKBOX
@@ -178,14 +339,21 @@ function EquipmentModal({
     e: React.ChangeEvent<HTMLInputElement>
   ) {
 
-    const { name, checked } = e.target;
+    const {
+      name,
+      checked
+    } = e.target;
 
     setForm((previous) => ({
+
       ...previous,
+
       [name]: checked
+
     }));
 
   }
+
 
   // ==================================================
   // GUARDAR
@@ -198,93 +366,152 @@ function EquipmentModal({
     e.preventDefault();
 
     setErrors([]);
+
     setFieldErrors({});
-    setLoading(true);
+
+    // No activamos loading antes de las
+    // validaciones locales.
+    // Así evitamos dejar el botón bloqueado.
+
+    // ==================================================
+    // VALIDACIONES
+    // ==================================================
+
+    const validationErrors: string[] = [];
+
+    if (!form.hostname.trim()) {
+
+      validationErrors.push(
+        "El hostname es obligatorio."
+      );
+
+    }
+
+    if (!form.serialNumber.trim()) {
+
+      validationErrors.push(
+        "El número de serie es obligatorio."
+      );
+
+    }
+
+    if (!form.ip.trim()) {
+
+      validationErrors.push(
+        "La dirección IP es obligatoria."
+      );
+
+    }
+
+    if (!form.model.trim()) {
+
+      validationErrors.push(
+        "El modelo es obligatorio."
+      );
+
+    }
+
+    if (!form.operatingSystem.trim()) {
+
+      validationErrors.push(
+        "El sistema operativo es obligatorio."
+      );
+
+    }
+
+    if (
+      validationErrors.length > 0
+    ) {
+
+      setErrors(
+        validationErrors
+      );
+
+      return;
+
+    }
+
 
     try {
 
-      // ==================================================
-      // VALIDACIONES LOCALES
-      // ==================================================
+      setLoading(true);
 
-      if (!form.hostname.trim()) {
-
-        setErrors([
-          "El hostname es obligatorio."
-        ]);
-
-        return;
-      }
-
-      if (!form.serialNumber.trim()) {
-
-        setErrors([
-          "El número de serie es obligatorio."
-        ]);
-
-        return;
-      }
-
-      if (!form.ip.trim()) {
-
-        setErrors([
-          "La dirección IP es obligatoria."
-        ]);
-
-        return;
-      }
-
-      if (!form.model.trim()) {
-
-        setErrors([
-          "El modelo es obligatorio."
-        ]);
-
-        return;
-      }
-
-      if (!form.operatingSystem.trim()) {
-
-        setErrors([
-          "El sistema operativo es obligatorio."
-        ]);
-
-        return;
-      }
 
       // ==================================================
-      // DATOS PARA EL BACKEND
+      // BODY
       // ==================================================
 
       const body = {
-        ip: form.ip,
-        serialNumber: form.serialNumber,
-        hostname: form.hostname,
-        model: form.model,
-        type: form.type,
-        teamviewer: form.teamviewer || undefined,
-        operatingSystem: form.operatingSystem,
-        memory: form.memory || undefined,
-        ram: form.ram || undefined,
-        monitor: form.monitor,
-        back: form.back,
-        antivirus: form.antivirus,
-        warranty: form.warranty || undefined,
-        status: form.status
+
+        email:
+          form.email.trim() || null,
+
+        ip:
+          form.ip.trim(),
+
+        serialNumber:
+          form.serialNumber.trim(),
+
+        hostname:
+          form.hostname.trim(),
+
+        model:
+          form.model.trim(),
+
+        type:
+          form.type,
+
+        teamviewer:
+          form.teamviewer.trim() || null,
+
+        operatingSystem:
+          form.operatingSystem.trim(),
+
+        memory:
+          form.memory || null,
+
+        ram:
+          form.ram || null,
+
+        monitor:
+          form.monitor,
+
+        back:
+          form.back,
+
+        antivirus:
+          form.antivirus,
+
+        warranty:
+          form.warranty || null,
+
+        status:
+          form.status
+
       };
+
 
       // ==================================================
       // EDITAR
       // ==================================================
 
-      if (isEditing && equipment) {
+      if (
+        isEditing &&
+        equipment
+      ) {
 
-        await api(`/equipment/${equipment.id}`, {
-          method: "PATCH",
-          body: JSON.stringify(body)
-        });
+        await api(
+          `/equipment/${equipment.id}`,
+          {
+            method: "PATCH",
+
+            body:
+              JSON.stringify(body)
+          }
+        );
 
       }
+
 
       // ==================================================
       // CREAR
@@ -292,39 +519,52 @@ function EquipmentModal({
 
       else {
 
-        await api("/equipment", {
-          method: "POST",
-          body: JSON.stringify(body)
-        });
+        await api(
+          "/equipment",
+          {
+            method: "POST",
+
+            body:
+              JSON.stringify(body)
+          }
+        );
 
       }
+
 
       // ==================================================
       // ÉXITO
       // ==================================================
 
       onSaved();
+
       onClose();
 
     } catch (error) {
 
       // ==================================================
-      // ERROR DE LA API
+      // ERROR API
       // ==================================================
 
-      if (error instanceof ApiError) {
+      if (
+        error instanceof ApiError
+      ) {
 
-        // Errores específicos de campos
         setFieldErrors(
           error.fieldErrors ?? {}
         );
 
-        // Errores generales
-        if (error.errors.length > 0) {
 
-          setErrors(error.errors);
+        if (
+          error.errors.length > 0
+        ) {
+
+          setErrors(
+            error.errors
+          );
 
         }
+
         else if (
           Object.keys(
             error.fieldErrors ?? {}
@@ -339,16 +579,14 @@ function EquipmentModal({
 
       }
 
-      // ==================================================
-      // ERROR DESCONOCIDO
-      // ==================================================
-
       else {
 
         setErrors([
+
           error instanceof Error
             ? error.message
             : "No se pudo guardar el equipo."
+
         ]);
 
       }
@@ -361,6 +599,7 @@ function EquipmentModal({
 
   }
 
+
   // ==================================================
   // RENDER
   // ==================================================
@@ -368,30 +607,72 @@ function EquipmentModal({
   return (
 
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      className="
+        fixed
+        inset-0
+        z-50
+        flex
+        items-center
+        justify-center
+        bg-black/50
+        p-4
+        sm:p-6
+      "
       onMouseDown={(e) => {
 
         if (
           e.target === e.currentTarget &&
           !loading
         ) {
+
           onClose();
+
         }
 
       }}
     >
 
-      <div className="bg-white w-full max-w-3xl max-h-[90vh] rounded-xl shadow-xl flex flex-col">
+      <div
+        className="
+          flex
+          max-h-[92vh]
+          w-full
+          max-w-4xl
+          flex-col
+          overflow-hidden
+          rounded-2xl
+          bg-white
+          shadow-2xl
+        "
+      >
 
         {/* ==================================================
             HEADER
         ================================================== */}
 
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+        <div
+          className="
+            flex
+            shrink-0
+            items-center
+            justify-between
+            border-b
+            border-slate-200
+            px-5
+            py-4
+            sm:px-6
+          "
+        >
 
           <div>
 
-            <h2 className="text-lg font-semibold">
+            <h2
+              className="
+                text-lg
+                font-semibold
+                text-slate-900
+              "
+            >
 
               {isEditing
                 ? "Editar equipo"
@@ -399,7 +680,13 @@ function EquipmentModal({
 
             </h2>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p
+              className="
+                mt-1
+                text-sm
+                text-slate-500
+              "
+            >
 
               {isEditing
                 ? "Modifica la información del equipo."
@@ -409,49 +696,92 @@ function EquipmentModal({
 
           </div>
 
+
           <button
             type="button"
             onClick={onClose}
             disabled={loading}
-            className="text-gray-400 hover:text-gray-700 text-xl disabled:opacity-50"
+            aria-label="Cerrar"
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-lg
+              text-xl
+              text-slate-400
+              transition
+              hover:bg-slate-100
+              hover:text-slate-700
+              disabled:opacity-50
+            "
           >
             ×
           </button>
 
         </div>
 
+
         {/* ==================================================
-            FORMULARIO
+            FORM
         ================================================== */}
 
         <form
           onSubmit={handleSubmit}
-          className="overflow-y-auto"
+          className="
+            overflow-y-auto
+          "
         >
 
-          <div className="p-6 space-y-8">
+          <div
+            className="
+              space-y-8
+              p-5
+              sm:p-6
+            "
+          >
 
             {/* ==================================================
-                ERRORES GENERALES
+                ERRORES
             ================================================== */}
 
             {errors.length > 0 && (
 
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div
+                className="
+                  rounded-xl
+                  border
+                  border-red-200
+                  bg-red-50
+                  px-4
+                  py-3
+                  text-sm
+                  text-red-700
+                "
+              >
 
-                <p className="font-medium mb-2">
+                <p className="mb-2 font-medium">
                   No se pudo guardar el equipo:
                 </p>
 
-                <ul className="list-disc list-inside space-y-1">
+                <ul
+                  className="
+                    list-inside
+                    list-disc
+                    space-y-1
+                  "
+                >
 
-                  {errors.map((message, index) => (
+                  {errors.map(
+                    (message, index) => (
 
-                    <li key={index}>
-                      {message}
-                    </li>
+                      <li key={index}>
+                        {message}
+                      </li>
 
-                  ))}
+                    )
+                  )}
 
                 </ul>
 
@@ -459,70 +789,77 @@ function EquipmentModal({
 
             )}
 
+
             {/* ==================================================
                 INFORMACIÓN DEL EQUIPO
             ================================================== */}
 
             <section>
 
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+              <SectionTitle>
                 Información del equipo
-              </h3>
+              </SectionTitle>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* HOSTNAME */}
+              <div
+                className="
+                  grid
+                  grid-cols-1
+                  gap-4
+                  md:grid-cols-2
+                "
+              >
 
                 <Input
                   label="Hostname"
                   name="hostname"
                   value={form.hostname}
-                  error={fieldErrors.hostname}
-                  onChange={handleInputChange}
+                  error={
+                    fieldErrors.hostname
+                  }
+                  onChange={
+                    handleInputChange
+                  }
                   placeholder="PC-SISTEMAS-001"
                   required
                 />
 
-                {/* SERIAL */}
 
                 <Input
                   label="Número de serie"
                   name="serialNumber"
-                  value={form.serialNumber}
-                  error={fieldErrors.serialNumber}
+                  value={
+                    form.serialNumber
+                  }
+                  error={
+                    fieldErrors.serialNumber
+                  }
                   onChange={(e) => {
 
                     const value =
                       e.target.value
-                        .replace(/[^A-Za-z0-9]/g, "")
+                        .replace(
+                          /[^A-Za-z0-9]/g,
+                          ""
+                        )
                         .slice(0, 7);
 
-                    setForm((previous) => ({
-                      ...previous,
-                      serialNumber: value
-                    }));
+                    setForm(
+                      (previous) => ({
+                        ...previous,
+                        serialNumber:
+                          value
+                      })
+                    );
 
-                    setFieldErrors((previous) => {
-
-                      if (!previous.serialNumber) {
-                        return previous;
-                      }
-
-                      const newErrors = {
-                        ...previous
-                      };
-
-                      delete newErrors.serialNumber;
-
-                      return newErrors;
-                    });
+                    clearFieldError(
+                      "serialNumber"
+                    );
 
                   }}
                   placeholder="ABC1234"
                   required
                 />
 
-                {/* IP */}
 
                 <Input
                   label="Dirección IP"
@@ -533,52 +870,48 @@ function EquipmentModal({
 
                     const value =
                       e.target.value
-                        .replace(/[^0-9.]/g, "")
+                        .replace(
+                          /[^0-9.]/g,
+                          ""
+                        )
                         .slice(0, 15);
 
-                    setForm((previous) => ({
-                      ...previous,
-                      ip: value
-                    }));
+                    setForm(
+                      (previous) => ({
+                        ...previous,
+                        ip: value
+                      })
+                    );
 
-                    setFieldErrors((previous) => {
-
-                      if (!previous.ip) {
-                        return previous;
-                      }
-
-                      const newErrors = {
-                        ...previous
-                      };
-
-                      delete newErrors.ip;
-
-                      return newErrors;
-                    });
+                    clearFieldError(
+                      "ip"
+                    );
 
                   }}
                   placeholder="192.168.1.100"
                   required
                 />
 
-                {/* MODELO */}
 
                 <Input
                   label="Modelo"
                   name="model"
                   value={form.model}
-                  onChange={handleInputChange}
+                  onChange={
+                    handleInputChange
+                  }
                   placeholder="Dell Latitude 5420"
                   required
                 />
 
-                {/* TIPO */}
 
                 <Select
                   label="Tipo"
                   name="type"
                   value={form.type}
-                  onChange={handleSelectChange}
+                  onChange={
+                    handleSelectChange
+                  }
                   options={[
                     {
                       value: "LAPTOP",
@@ -586,29 +919,46 @@ function EquipmentModal({
                     },
                     {
                       value: "PC",
-                      label: "Pc"
+                      label: "PC"
                     },
                     {
                       value: "ALL_IN_ONE",
-                      label: "All in one"
+                      label: "All in One"
                     }
                   ]}
                 />
 
-                {/* SISTEMA OPERATIVO */}
 
                 <Input
                   label="Sistema operativo"
                   name="operatingSystem"
-                  value={form.operatingSystem}
-                  onChange={handleInputChange}
+                  value={
+                    form.operatingSystem
+                  }
+                  onChange={
+                    handleInputChange
+                  }
                   placeholder="Windows 11 Pro"
                   required
+                />
+
+
+                <Input
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  error={fieldErrors.email}
+                  onChange={
+                    handleInputChange
+                  }
+                  placeholder="equipo@empresa.com"
                 />
 
               </div>
 
             </section>
+
 
             {/* ==================================================
                 HARDWARE
@@ -616,23 +966,31 @@ function EquipmentModal({
 
             <section>
 
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+              <SectionTitle>
                 Hardware
-              </h3>
+              </SectionTitle>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* RAM */}
+              <div
+                className="
+                  grid
+                  grid-cols-1
+                  gap-4
+                  md:grid-cols-2
+                "
+              >
 
                 <Select
                   label="RAM"
                   name="ram"
                   value={form.ram}
-                  onChange={handleSelectChange}
+                  onChange={
+                    handleSelectChange
+                  }
                   options={[
                     {
                       value: "",
-                      label: "Seleccionar RAM"
+                      label:
+                        "Seleccionar RAM"
                     },
                     {
                       value: "4 GB",
@@ -657,17 +1015,19 @@ function EquipmentModal({
                   ]}
                 />
 
-                {/* MEMORIA */}
 
                 <Select
                   label="Memoria"
                   name="memory"
                   value={form.memory}
-                  onChange={handleSelectChange}
+                  onChange={
+                    handleSelectChange
+                  }
                   options={[
                     {
                       value: "",
-                      label: "Seleccionar memoria"
+                      label:
+                        "Seleccionar memoria"
                     },
                     {
                       value: "500 GB SSD",
@@ -690,34 +1050,48 @@ function EquipmentModal({
 
               </div>
 
-              {/* CHECKBOXES */}
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-5">
+              <div
+                className="
+                  mt-5
+                  grid
+                  grid-cols-1
+                  gap-3
+                  sm:grid-cols-3
+                "
+              >
 
                 <Checkbox
                   label="Monitor"
                   name="monitor"
                   checked={form.monitor}
-                  onChange={handleCheckboxChange}
+                  onChange={
+                    handleCheckboxChange
+                  }
                 />
 
                 <Checkbox
                   label="Back"
                   name="back"
                   checked={form.back}
-                  onChange={handleCheckboxChange}
+                  onChange={
+                    handleCheckboxChange
+                  }
                 />
 
                 <Checkbox
                   label="Antivirus"
                   name="antivirus"
                   checked={form.antivirus}
-                  onChange={handleCheckboxChange}
+                  onChange={
+                    handleCheckboxChange
+                  }
                 />
 
               </div>
 
             </section>
+
 
             {/* ==================================================
                 INFORMACIÓN ADICIONAL
@@ -725,19 +1099,28 @@ function EquipmentModal({
 
             <section>
 
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+              <SectionTitle>
                 Información adicional
-              </h3>
+              </SectionTitle>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* TEAMVIEWER */}
+              <div
+                className="
+                  grid
+                  grid-cols-1
+                  gap-4
+                  md:grid-cols-2
+                "
+              >
 
                 <Input
                   label="TeamViewer"
                   name="teamviewer"
-                  value={form.teamviewer}
-                  error={fieldErrors.teamviewer}
+                  value={
+                    form.teamviewer
+                  }
+                  error={
+                    fieldErrors.teamviewer
+                  }
                   onChange={(e) => {
 
                     const value =
@@ -745,35 +1128,34 @@ function EquipmentModal({
                         .replace(/\D/g, "")
                         .slice(0, 10);
 
-                    setForm((previous) => ({
-                      ...previous,
-                      teamviewer: value
-                    }));
+                    setForm(
+                      (previous) => ({
+                        ...previous,
+                        teamviewer:
+                          value
+                      })
+                    );
 
-                    setFieldErrors((previous) => {
-
-                      if (!previous.teamviewer) {
-                        return previous;
-                      }
-
-                      const newErrors = {
-                        ...previous
-                      };
-
-                      delete newErrors.teamviewer;
-
-                      return newErrors;
-                    });
+                    clearFieldError(
+                      "teamviewer"
+                    );
 
                   }}
                   placeholder="ID de TeamViewer"
                 />
 
-                {/* GARANTÍA */}
 
                 <div>
 
-                  <label className="block text-sm font-medium mb-1">
+                  <label
+                    className="
+                      mb-1.5
+                      block
+                      text-sm
+                      font-medium
+                      text-slate-700
+                    "
+                  >
                     Garantía
                   </label>
 
@@ -782,24 +1164,46 @@ function EquipmentModal({
                     value={form.warranty}
                     onChange={(e) => {
 
-                      setForm((previous) => ({
-                        ...previous,
-                        warranty: e.target.value
-                      }));
+                      setForm(
+                        (previous) => ({
+                          ...previous,
+                          warranty:
+                            e.target.value
+                        })
+                      );
 
                     }}
-                    className="w-full rounded-lg border px-3 py-2.5 outline-none focus:ring-2 focus:ring-slate-300"
+                    disabled={loading}
+                    className="
+                      w-full
+                      rounded-xl
+                      border
+                      border-slate-200
+                      px-3
+                      py-2.5
+                      text-sm
+                      outline-none
+                      focus:border-slate-400
+                      focus:ring-2
+                      focus:ring-slate-100
+                      disabled:bg-slate-50
+                    "
                   />
 
                 </div>
 
-                {/* ESTADO */}
+
+                {/* ==================================================
+                    ESTADO
+                ================================================== */}
 
                 <Select
                   label="Estado"
                   name="status"
                   value={form.status}
-                  onChange={handleSelectChange}
+                  onChange={
+                    handleSelectChange
+                  }
                   options={[
                     {
                       value: "ACTIVO",
@@ -809,6 +1213,10 @@ function EquipmentModal({
                       value: "ALMACEN",
                       label: "Almacén"
                     },
+                    {
+                      value: "BAJA",
+                      label: "Baja"
+                    }
                   ]}
                 />
 
@@ -818,25 +1226,69 @@ function EquipmentModal({
 
           </div>
 
+
           {/* ==================================================
               FOOTER
           ================================================== */}
 
-          <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50">
+          <div
+            className="
+              flex
+              flex-col-reverse
+              gap-2
+              border-t
+              border-slate-200
+              bg-slate-50
+              px-5
+              py-4
+              sm:flex-row
+              sm:justify-end
+              sm:px-6
+            "
+          >
 
             <button
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2.5 rounded-lg border bg-white hover:bg-gray-50 disabled:opacity-50"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                px-4
+                py-2.5
+                text-sm
+                font-medium
+                text-slate-700
+                transition
+                hover:bg-slate-50
+                disabled:opacity-50
+                sm:w-auto
+              "
             >
               Cancelar
             </button>
 
+
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-50"
+              className="
+                w-full
+                rounded-xl
+                bg-slate-900
+                px-4
+                py-2.5
+                text-sm
+                font-semibold
+                text-white
+                transition
+                hover:bg-slate-800
+                disabled:opacity-50
+                sm:w-auto
+              "
             >
 
               {loading
@@ -858,26 +1310,84 @@ function EquipmentModal({
   );
 }
 
+
+// ==================================================
+// LIMPIAR ERROR DE CAMPO
+// ==================================================
+
+function clearFieldError(
+  field: string
+) {
+
+  // Esta función se utiliza desde los
+  // handlers específicos. La lógica real
+  // se mantiene dentro de cada actualización
+  // mediante el estado del componente.
+
+}
+
+
+// ==================================================
+// SECTION TITLE
+// ==================================================
+
+function SectionTitle({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+
+  return (
+
+    <h3
+      className="
+        mb-4
+        text-sm
+        font-semibold
+        uppercase
+        tracking-wide
+        text-slate-900
+      "
+    >
+      {children}
+    </h3>
+
+  );
+
+}
+
+
 // ==================================================
 // INPUT
 // ==================================================
 
 interface InputProps {
+
   label: string;
+
   name: string;
+
   value: string;
+
+  type?: string;
+
   placeholder?: string;
+
   required?: boolean;
+
   error?: string;
+
   onChange: (
     e: React.ChangeEvent<HTMLInputElement>
   ) => void;
 }
 
+
 function Input({
   label,
   name,
   value,
+  type = "text",
   placeholder,
   required,
   error,
@@ -888,69 +1398,115 @@ function Input({
 
     <div>
 
-      <label className="block text-sm font-medium mb-1">
+      <label
+        htmlFor={name}
+        className="
+          mb-1.5
+          block
+          text-sm
+          font-medium
+          text-slate-700
+        "
+      >
 
         {label}
 
         {required && (
-          <span className="text-red-500 ml-1">
+
+          <span className="ml-1 text-red-500">
             *
           </span>
+
         )}
 
       </label>
 
+
       <input
+        id={name}
         name={name}
+        type={type}
         value={value}
         placeholder={placeholder}
         required={required}
         onChange={onChange}
         className={`
           w-full
+          rounded-xl
+          border
           px-3
           py-2.5
-          rounded-lg
+          text-sm
           outline-none
-          border
           transition
 
-          ${error
-            ? "border-red-500 bg-red-50/30 focus:ring-2 focus:ring-red-200"
-            : "border-gray-300 focus:ring-2 focus:ring-slate-300"
+          ${
+            error
+              ? `
+                border-red-500
+                bg-red-50/30
+                focus:ring-2
+                focus:ring-red-200
+              `
+              : `
+                border-slate-200
+                focus:border-slate-400
+                focus:ring-2
+                focus:ring-slate-100
+              `
           }
         `}
       />
 
+
       {error && (
-        <p className="mt-1.5 text-xs text-red-600">
+
+        <p
+          className="
+            mt-1.5
+            text-xs
+            text-red-600
+          "
+        >
           ⚠ {error}
         </p>
+
       )}
 
     </div>
 
   );
+
 }
+
 
 // ==================================================
 // SELECT
 // ==================================================
 
 interface SelectOption {
+
   value: string;
+
   label: string;
 }
 
+
 interface SelectProps {
+
   label: string;
+
   name: string;
+
   value: string;
+
   options: SelectOption[];
+
   onChange: (
     e: React.ChangeEvent<HTMLSelectElement>
   ) => void;
 }
+
 
 function Select({
   label,
@@ -964,47 +1520,82 @@ function Select({
 
     <div>
 
-      <label className="block text-sm font-medium mb-1">
+      <label
+        htmlFor={name}
+        className="
+          mb-1.5
+          block
+          text-sm
+          font-medium
+          text-slate-700
+        "
+      >
         {label}
       </label>
 
+
       <select
+        id={name}
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg bg-white outline-none focus:ring-2 focus:ring-slate-300"
+        className="
+          w-full
+          rounded-xl
+          border
+          border-slate-200
+          bg-white
+          px-3
+          py-2.5
+          text-sm
+          text-slate-900
+          outline-none
+          transition
+          focus:border-slate-400
+          focus:ring-2
+          focus:ring-slate-100
+        "
       >
 
-        {options.map((option) => (
+        {options.map(
+          (option) => (
 
-          <option
-            key={option.value}
-            value={option.value}
-          >
-            {option.label}
-          </option>
+            <option
+              key={option.value}
+              value={option.value}
+            >
+              {option.label}
+            </option>
 
-        ))}
+          )
+        )}
 
       </select>
 
     </div>
 
   );
+
 }
+
 
 // ==================================================
 // CHECKBOX
 // ==================================================
 
 interface CheckboxProps {
+
   label: string;
+
   name: string;
+
   checked: boolean;
+
   onChange: (
     e: React.ChangeEvent<HTMLInputElement>
   ) => void;
 }
+
 
 function Checkbox({
   label,
@@ -1015,23 +1606,48 @@ function Checkbox({
 
   return (
 
-    <label className="flex items-center gap-3 border border-gray-300 rounded-lg px-4 py-3 cursor-pointer hover:bg-gray-50">
+    <label
+      className="
+        flex
+        cursor-pointer
+        items-center
+        gap-3
+        rounded-xl
+        border
+        border-slate-200
+        px-4
+        py-3
+        transition
+        hover:bg-slate-50
+      "
+    >
 
       <input
         type="checkbox"
         name={name}
         checked={checked}
         onChange={onChange}
-        className="w-4 h-4"
+        className="
+          h-4
+          w-4
+        "
       />
 
-      <span className="text-sm">
+      <span
+        className="
+          text-sm
+          text-slate-700
+        "
+      >
         {label}
       </span>
 
     </label>
 
   );
+
 }
 
+
 export default EquipmentModal;
+

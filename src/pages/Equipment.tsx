@@ -1200,13 +1200,6 @@ function EquipmentCard({
                                 {item.user.name}
                             </p>
 
-                            <p className="
-                                truncate
-                                text-xs
-                                text-slate-500
-                            ">
-                                {item.user.email}
-                            </p>
 
                         </div>
 

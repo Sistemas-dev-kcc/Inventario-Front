@@ -433,10 +433,9 @@ function Users() {
                                 title="Vista de tabla"
                                 className={`
                                     flex h-9 w-10 items-center justify-center rounded-lg transition
-                                    ${
-                                        viewMode === "table"
-                                            ? "bg-white text-slate-900 shadow-sm"
-                                            : "text-slate-400 hover:text-slate-700"
+                                    ${viewMode === "table"
+                                        ? "bg-white text-slate-900 shadow-sm"
+                                        : "text-slate-400 hover:text-slate-700"
                                     }
                                 `}
                             >
@@ -464,10 +463,9 @@ function Users() {
                                 title="Vista de tarjetas"
                                 className={`
                                     flex h-9 w-10 items-center justify-center rounded-lg transition
-                                    ${
-                                        viewMode === "cards"
-                                            ? "bg-white text-slate-900 shadow-sm"
-                                            : "text-slate-400 hover:text-slate-700"
+                                    ${viewMode === "cards"
+                                        ? "bg-white text-slate-900 shadow-sm"
+                                        : "text-slate-400 hover:text-slate-700"
                                     }
                                 `}
                             >
@@ -635,7 +633,9 @@ function Users() {
                                                     className="group transition-colors hover:bg-slate-50/70"
                                                 >
 
-                                                    {/* USUARIO */}
+                                                    {/* ==========================================
+                        USUARIO
+                    ========================================== */}
 
                                                     <td className="px-6 py-4">
 
@@ -651,9 +651,7 @@ function Users() {
                                                                     {user.name}
                                                                 </p>
 
-                                                                <p className="mt-0.5 truncate text-xs text-slate-500">
-                                                                    {user.email}
-                                                                </p>
+                                                    
 
                                                             </div>
 
@@ -661,23 +659,21 @@ function Users() {
 
                                                     </td>
 
-                                                    {/* DEPARTAMENTO */}
+                                                    {/* ==========================================
+                        DEPARTAMENTO
+                    ========================================== */}
 
                                                     <td className="px-6 py-4">
 
-                                                        <span className="text-sm text-slate-700">
-
-                                                            {user.department || (
-                                                                <span className="text-slate-400">
-                                                                    Sin departamento
-                                                                </span>
-                                                            )}
-
+                                                        <span className="inline-flex rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                                                            {(user.department)}
                                                         </span>
 
                                                     </td>
 
-                                                    {/* PUESTO */}
+                                                    {/* ==========================================
+                        PUESTO
+                    ========================================== */}
 
                                                     <td className="px-6 py-4">
 
@@ -693,7 +689,9 @@ function Users() {
 
                                                     </td>
 
-                                                    {/* EQUIPOS */}
+                                                    {/* ==========================================
+                        EQUIPOS
+                    ========================================== */}
 
                                                     <td className="px-6 py-4 text-center">
 
@@ -709,7 +707,9 @@ function Users() {
 
                                                     </td>
 
-                                                    {/* ESTADO */}
+                                                    {/* ==========================================
+                        ESTADO
+                    ========================================== */}
 
                                                     <td className="px-6 py-4">
 
@@ -719,23 +719,30 @@ function Users() {
 
                                                     </td>
 
-                                                    {/* ACCIONES */}
+                                                    {/* ==========================================
+                        ACCIONES
+                    ========================================== */}
 
                                                     <td className="px-6 py-4">
 
-                                                        <ActionButtons
-                                                            user={user}
-                                                            onView={handleViewUser}
-                                                            onEdit={handleEdit}
-                                                            onToggle={toggleUserStatus}
-                                                            onDelete={handleDeleteClick}
-                                                        />
+                                                        <div className="flex justify-end">
+
+                                                            <ActionButtons
+                                                                user={user}
+                                                                onView={handleViewUser}
+                                                                onEdit={handleEdit}
+                                                                onToggle={toggleUserStatus}
+                                                                onDelete={handleDeleteClick}
+                                                            />
+
+                                                        </div>
 
                                                     </td>
 
                                                 </tr>
 
                                             );
+
                                         })}
 
                                     </tbody>
@@ -1203,10 +1210,6 @@ function UserCard({
                         <h3 className="truncate text-sm font-bold text-slate-900 sm:text-base">
                             {user.name}
                         </h3>
-
-                        <p className="mt-0.5 truncate text-xs text-slate-500">
-                            {user.email}
-                        </p>
 
                     </div>
 

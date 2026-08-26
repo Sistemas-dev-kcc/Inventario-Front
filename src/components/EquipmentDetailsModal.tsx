@@ -20,105 +20,145 @@ function EquipmentDetailsModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) {
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
+      <div className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-white shadow-xl">
 
-      <div className="bg-white w-full max-w-3xl max-h-[90vh] rounded-xl shadow-xl flex flex-col">
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
 
-        {/* HEADER */}
+        <div className="flex items-center justify-between border-b px-6 py-4">
 
-        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div className="flex items-center gap-4">
 
-          <div>
-            <h2 className="text-lg font-semibold">
-              Información del equipo
-            </h2>
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-slate-800 text-xl text-white">
+              💻
+            </div>
 
-            <p className="text-sm text-gray-500 mt-1">
-              {equipment.hostname}
-            </p>
+            <div>
+
+              <h2 className="text-lg font-semibold text-gray-900">
+                {equipment.hostname}
+              </h2>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Información completa del equipo
+              </p>
+
+            </div>
+
           </div>
 
           <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 text-xl"
+            className="text-xl text-gray-400 transition hover:text-gray-700"
+            aria-label="Cerrar"
           >
             ×
           </button>
 
         </div>
 
-        {/* CONTENT */}
+        {/* =====================================================
+            CONTENT
+        ===================================================== */}
 
-        <div className="overflow-y-auto p-6 space-y-8">
+        <div className="space-y-8 overflow-y-auto p-6">
 
-          {/* ESTADO */}
+          {/* =====================================================
+              ESTADO
+          ===================================================== */}
 
           <section>
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
 
-              <h3 className="text-sm font-semibold uppercase tracking-wide">
-                Estado
-              </h3>
+              <div>
 
-              <span className={getStatusClass(equipment.status)}>
-                {getStatusLabel(equipment.status)}
-              </span>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900">
+                  Estado del equipo
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Estado actual dentro del inventario
+                </p>
+
+              </div>
+
+              <StatusBadge
+                status={equipment.status}
+              />
 
             </div>
 
           </section>
 
-          {/* ASIGNACIÓN */}
+          {/* =====================================================
+              ASIGNACIÓN
+          ===================================================== */}
 
           <section>
 
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex items-center justify-between">
 
-              <h3 className="text-sm font-semibold uppercase tracking-wide">
-                Asignación
-              </h3>
+              <div>
 
-              <button
-                onClick={onAssign}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-              >
-                {equipment.user
-                  ? "Cambiar usuario"
-                  : "Asignar equipo"}
-              </button>
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900">
+                  Asignación
+                </h3>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Usuario responsable del equipo
+                </p>
+
+              </div>
+
+              {equipment.status !== "BAJA" && (
+                <button
+                  type="button"
+                  onClick={onAssign}
+                  className="text-sm font-medium text-blue-600 transition hover:text-blue-800"
+                >
+                  {equipment.user
+                    ? "Cambiar usuario"
+                    : "Asignar equipo"}
+                </button>
+              )}
 
             </div>
 
             {equipment.user ? (
 
-              <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="rounded-xl border bg-gray-50 p-5">
 
                 <div className="flex items-center gap-4">
 
-                  <div className="w-11 h-11 rounded-full bg-slate-800 text-white flex items-center justify-center font-semibold">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-800 font-semibold text-white">
                     {getInitials(equipment.user.name)}
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
 
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-900">
                       {equipment.user.name}
                     </p>
 
-                    <p className="text-sm text-gray-500">
-                      {equipment.user.email}
-                    </p>
-
                     {equipment.user.department && (
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="mt-1 text-xs text-gray-400">
                         {equipment.user.department}
+                      </p>
+                    )}
+
+                    {equipment.user.position && (
+                      <p className="text-xs text-gray-400">
+                        {equipment.user.position}
                       </p>
                     )}
 
@@ -130,18 +170,21 @@ function EquipmentDetailsModal({
 
             ) : (
 
-              <div className="border border-dashed rounded-lg p-5 text-center">
+              <div className="rounded-lg border border-dashed p-6 text-center">
 
-                <p className="text-gray-500">
+                <p className="text-sm text-gray-500">
                   Este equipo no está asignado a ningún usuario.
                 </p>
 
-                <button
-                  onClick={onAssign}
-                  className="mt-3 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800"
-                >
-                  Asignar equipo
-                </button>
+                {equipment.status !== "BAJA" && (
+                  <button
+                    type="button"
+                    onClick={onAssign}
+                    className="mt-3 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white transition hover:bg-slate-800"
+                  >
+                    Asignar equipo
+                  </button>
+                )}
 
               </div>
 
@@ -149,15 +192,17 @@ function EquipmentDetailsModal({
 
           </section>
 
-          {/* INFORMACIÓN GENERAL */}
+          {/* =====================================================
+              INFORMACIÓN GENERAL
+          ===================================================== */}
 
           <section>
 
-            <h3 className="text-sm font-semibold uppercase tracking-wide mb-4">
+            <SectionTitle>
               Información general
-            </h3>
+            </SectionTitle>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 
               <Info
                 label="Hostname"
@@ -172,6 +217,11 @@ function EquipmentDetailsModal({
               <Info
                 label="Dirección IP"
                 value={equipment.ip}
+              />
+
+              <Info
+                label="Correo electrónico"
+                value={equipment.email}
               />
 
               <Info
@@ -193,15 +243,17 @@ function EquipmentDetailsModal({
 
           </section>
 
-          {/* HARDWARE */}
+          {/* =====================================================
+              HARDWARE
+          ===================================================== */}
 
           <section>
 
-            <h3 className="text-sm font-semibold uppercase tracking-wide mb-4">
+            <SectionTitle>
               Hardware
-            </h3>
+            </SectionTitle>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 
               <Info
                 label="RAM"
@@ -232,15 +284,17 @@ function EquipmentDetailsModal({
 
           </section>
 
-          {/* INFORMACIÓN ADICIONAL */}
+          {/* =====================================================
+              INFORMACIÓN ADICIONAL
+          ===================================================== */}
 
           <section>
 
-            <h3 className="text-sm font-semibold uppercase tracking-wide mb-4">
+            <SectionTitle>
               Información adicional
-            </h3>
+            </SectionTitle>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
 
               <Info
                 label="TeamViewer"
@@ -249,7 +303,7 @@ function EquipmentDetailsModal({
 
               <Info
                 label="Garantía"
-                value={equipment.warranty}
+                value={formatWarranty(equipment.warranty)}
               />
 
               <Info
@@ -268,13 +322,16 @@ function EquipmentDetailsModal({
 
         </div>
 
-        {/* FOOTER */}
+        {/* =====================================================
+            FOOTER
+        ===================================================== */}
 
-        <div className="flex justify-end px-6 py-4 border-t">
+        <div className="flex justify-end border-t px-6 py-4">
 
           <button
+            type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-lg border hover:bg-gray-50"
+            className="rounded-lg border px-4 py-2.5 transition hover:bg-gray-50"
           >
             Cerrar
           </button>
@@ -282,32 +339,59 @@ function EquipmentDetailsModal({
         </div>
 
       </div>
-
     </div>
   );
+}
+
+/* =========================================================
+   SECTION TITLE
+========================================================= */
+
+function SectionTitle({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+
+  return (
+    <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-900">
+      {children}
+    </h3>
+  );
+}
+
+/* =========================================================
+   INFO
+========================================================= */
+
+interface InfoProps {
+  label: string;
+  value?: string | null;
 }
 
 function Info({
   label,
   value
-}: {
-  label: string;
-  value?: string | null;
-}) {
-  return (
-    <div className="border rounded-lg px-4 py-3">
+}: InfoProps) {
 
-      <p className="text-xs text-gray-500 mb-1">
+  return (
+    <div className="rounded-lg border px-4 py-3">
+
+      <p className="mb-1 text-xs text-gray-500">
         {label}
       </p>
 
-      <p className="text-sm font-medium">
+      <p className="break-words text-sm font-medium text-gray-900">
         {value || "No especificado"}
       </p>
 
     </div>
   );
 }
+
+/* =========================================================
+   BOOLEAN INFO
+========================================================= */
 
 function BooleanInfo({
   label,
@@ -316,98 +400,166 @@ function BooleanInfo({
   label: string;
   value: boolean;
 }) {
-  return (
-    <div className="border rounded-lg px-4 py-3">
 
-      <p className="text-xs text-gray-500 mb-1">
+  return (
+    <div className="rounded-lg border px-4 py-3">
+
+      <p className="mb-1 text-xs text-gray-500">
         {label}
       </p>
 
-      <p className="text-sm font-medium">
-        {value ? "Sí" : "No"}
-      </p>
+      <div className="flex items-center gap-2">
+
+        <span
+          className={`
+            h-2
+            w-2
+            rounded-full
+            ${value
+              ? "bg-green-500"
+              : "bg-gray-300"
+            }
+          `}
+        />
+
+        <p
+          className={`
+            text-sm
+            font-medium
+            ${value
+              ? "text-green-700"
+              : "text-gray-500"
+            }
+          `}
+        >
+          {value ? "Sí" : "No"}
+        </p>
+
+      </div>
 
     </div>
   );
 }
 
+/* =========================================================
+   STATUS BADGE
+========================================================= */
+
+function StatusBadge({
+  status
+}: {
+  status: string;
+}) {
+
+  return (
+    <span className={getStatusClass(status)}>
+      {getStatusLabel(status)}
+    </span>
+  );
+}
+
+/* =========================================================
+   TYPE LABEL
+========================================================= */
+
+function getTypeLabel(type: string) {
+
+  const types: Record<string, string> = {
+    LAPTOP: "Laptop",
+    PC: "PC",
+    ALL_IN_ONE: "All in One"
+  };
+
+  return types[type] ?? type;
+}
+
+/* =========================================================
+   STATUS LABEL
+========================================================= */
+
+function getStatusLabel(status: string) {
+
+  const statuses: Record<string, string> = {
+    ACTIVO: "Activo",
+    ALMACEN: "Almacén",
+    BAJA: "Baja"
+  };
+
+  return statuses[status] ?? status;
+}
+
+/* =========================================================
+   STATUS CLASS
+========================================================= */
+
+function getStatusClass(status: string) {
+
+  const classes: Record<string, string> = {
+
+    ACTIVO:
+      "rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700",
+
+    ALMACEN:
+      "rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700",
+
+    BAJA:
+      "rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"
+
+  };
+
+  return (
+    classes[status] ??
+    "rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700"
+  );
+}
+
+/* =========================================================
+   INITIALS
+========================================================= */
+
 function getInitials(name: string) {
+
   return name
-    .split(" ")
+    .trim()
+    .split(/\s+/)
     .slice(0, 2)
-    .map((word) => word[0])
+    .map((word) => word.charAt(0))
     .join("")
     .toUpperCase();
 }
 
-function getTypeLabel(type: string) {
-  switch (type) {
-    case "LAPTOP":
-      return "Laptop";
+/* =========================================================
+   WARRANTY
+========================================================= */
 
-    case "DESKTOP":
-      return "Desktop";
+function formatWarranty(
+  warranty?: string | null
+) {
 
-    case "MONITOR":
-      return "Monitor";
-
-    case "PRINTER":
-      return "Impresora";
-
-    case "OTHER":
-      return "Otro";
-
-    default:
-      return type;
+  if (!warranty) {
+    return null;
   }
+
+  return formatDate(warranty);
 }
 
-function getStatusLabel(status: string) {
-  switch (status) {
-    case "ACTIVO":
-      return "Activo";
+/* =========================================================
+   DATE
+========================================================= */
 
-    case "DISPONIBLE":
-      return "Disponible";
+function formatDate(date?: string | null) {
 
-    case "MANTENIMIENTO":
-      return "Mantenimiento";
-
-    case "ALMACEN":
-      return "Almacén";
-
-    case "BAJA":
-      return "Baja";
-
-    default:
-      return status;
+  if (!date) {
+    return "No especificado";
   }
-}
 
-function getStatusClass(status: string) {
-  switch (status) {
-    case "ACTIVO":
-      return "px-3 py-1 rounded-full text-xs bg-green-100 text-green-700";
+  const parsedDate = new Date(date);
 
-    case "DISPONIBLE":
-      return "px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700";
-
-    case "MANTENIMIENTO":
-      return "px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700";
-
-    case "ALMACEN":
-      return "px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-700";
-
-    case "BAJA":
-      return "px-3 py-1 rounded-full text-xs bg-red-100 text-red-700";
-
-    default:
-      return "px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700";
+  if (Number.isNaN(parsedDate.getTime())) {
+    return date;
   }
-}
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("es-MX", {
+  return parsedDate.toLocaleDateString("es-MX", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric"
