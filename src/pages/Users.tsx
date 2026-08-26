@@ -8,43 +8,59 @@ import UserDetailsModal from "../components/UserDetailsModal";
 
 function Users() {
     const [users, setUsers] = useState<User[]>([]);
-
     const [search, setSearch] = useState("");
-
     const [loading, setLoading] = useState(true);
-
     const [error, setError] = useState("");
 
     const [modalOpen, setModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-    const [selectedUser, setSelectedUser] =
-        useState<User | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+    const [deleteError, setDeleteError] = useState("");
 
-    const [confirmOpen, setConfirmOpen] =
-        useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
 
-    const [userToDelete, setUserToDelete] =
-        useState<User | null>(null);
+    /*
+    ======================================================
+    VISTA
+    ======================================================
+    */
 
-    const [deleteLoading, setDeleteLoading] =
-        useState(false);
+    const [viewMode, setViewMode] = useState<"table" | "cards">(
+        window.innerWidth < 768 ? "cards" : "table"
+    );
 
-    const [deleteError, setDeleteError] =
-        useState("");
+    /*
+    ======================================================
+    RESPONSIVE
+    ======================================================
+    */
 
-    const [detailsOpen, setDetailsOpen] =
-        useState(false);
+    useEffect(() => {
+        function handleResize() {
+            if (window.innerWidth < 768) {
+                setViewMode("cards");
+            } else {
+                setViewMode("table");
+            }
+        }
 
-    // ==========================================
-    // VISTA
-    // ==========================================
+        handleResize();
 
-    const [viewMode, setViewMode] =
-        useState<"table" | "cards">("table");
+        window.addEventListener("resize", handleResize);
 
-    // ==========================================
-    // CARGAR USUARIOS
-    // ==========================================
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
+
+    /*
+    ======================================================
+    CARGAR USUARIOS
+    ======================================================
+    */
 
     useEffect(() => {
         loadUsers();
@@ -69,9 +85,11 @@ function Users() {
         }
     }
 
-    // ==========================================
-    // USUARIO
-    // ==========================================
+    /*
+    ======================================================
+    USUARIO
+    ======================================================
+    */
 
     function handleViewUser(user: User) {
         setSelectedUser(user);
@@ -98,9 +116,11 @@ function Users() {
         setSelectedUser(null);
     }
 
-    // ==========================================
-    // ELIMINAR
-    // ==========================================
+    /*
+    ======================================================
+    ELIMINAR
+    ======================================================
+    */
 
     function handleDeleteClick(user: User) {
         setUserToDelete(user);
@@ -136,9 +156,11 @@ function Users() {
         }
     }
 
-    // ==========================================
-    // BUSCAR
-    // ==========================================
+    /*
+    ======================================================
+    BUSCAR
+    ======================================================
+    */
 
     async function searchUsers(value: string) {
         setSearch(value);
@@ -162,9 +184,11 @@ function Users() {
         }
     }
 
-    // ==========================================
-    // CAMBIAR ESTADO
-    // ==========================================
+    /*
+    ======================================================
+    CAMBIAR ESTADO
+    ======================================================
+    */
 
     async function toggleUserStatus(user: User) {
         try {
@@ -187,9 +211,11 @@ function Users() {
         }
     }
 
-    // ==========================================
-    // INICIALES
-    // ==========================================
+    /*
+    ======================================================
+    INICIALES
+    ======================================================
+    */
 
     function getInitials(name: string) {
         return name
@@ -201,24 +227,26 @@ function Users() {
             .toUpperCase();
     }
 
-    // ==========================================
-    // RENDER
-    // ==========================================
+    /*
+    ======================================================
+    RENDER
+    ======================================================
+    */
 
     return (
-        <div className="min-h-full bg-slate-50 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-full bg-slate-50 p-3 sm:p-6 lg:p-8">
 
-            {/* ==========================================
+            {/* ======================================================
                 HEADER
-            ========================================== */}
+            ====================================================== */}
 
-            <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-5 flex flex-col gap-4 sm:mb-6 lg:flex-row lg:items-center lg:justify-between">
 
-                <div>
+                <div className="min-w-0">
 
                     <div className="flex items-center gap-3">
 
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm sm:h-11 sm:w-11">
 
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -249,13 +277,13 @@ function Users() {
 
                         </div>
 
-                        <div>
+                        <div className="min-w-0">
 
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                            <h1 className="truncate text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
                                 Usuarios
                             </h1>
 
-                            <p className="mt-0.5 text-sm text-slate-500">
+                            <p className="mt-0.5 text-xs text-slate-500 sm:text-sm">
                                 Administración y gestión de usuarios
                             </p>
 
@@ -267,7 +295,25 @@ function Users() {
 
                 <button
                     onClick={handleCreate}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 active:scale-[0.98]"
+                    className="
+                        inline-flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-slate-900
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        text-white
+                        shadow-sm
+                        transition
+                        hover:bg-slate-800
+                        active:scale-[0.98]
+                        sm:w-auto
+                    "
                 >
 
                     <svg
@@ -291,15 +337,15 @@ function Users() {
 
             </div>
 
-            {/* ==========================================
-                CONTENEDOR
-            ========================================== */}
+            {/* ======================================================
+                CONTENEDOR PRINCIPAL
+            ====================================================== */}
 
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                {/* ==========================================
+                {/* ======================================================
                     TOOLBAR
-                ========================================== */}
+                ====================================================== */}
 
                 <div className="flex flex-col gap-4 border-b border-slate-200 p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
 
@@ -317,7 +363,7 @@ function Users() {
 
                     </div>
 
-                    <div className="flex flex-col gap-3 sm:flex-row">
+                    <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
 
                         {/* BUSCADOR */}
 
@@ -351,20 +397,39 @@ function Users() {
                                     searchUsers(e.target.value)
                                 }
                                 placeholder="Buscar usuario..."
-                                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:bg-white focus:ring-2 focus:ring-slate-100"
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    bg-slate-50
+                                    py-2.5
+                                    pl-10
+                                    pr-4
+                                    text-sm
+                                    text-slate-900
+                                    outline-none
+                                    transition
+                                    placeholder:text-slate-400
+                                    focus:border-slate-400
+                                    focus:bg-white
+                                    focus:ring-2
+                                    focus:ring-slate-100
+                                "
                             />
 
                         </div>
 
-                        {/* CAMBIO DE VISTA */}
+                        {/* ======================================================
+                            CAMBIO DE VISTA
+                            Solo escritorio
+                        ====================================================== */}
 
-                        <div className="flex items-center rounded-xl border border-slate-200 bg-slate-50 p-1">
+                        <div className="hidden items-center rounded-xl border border-slate-200 bg-slate-50 p-1 md:flex">
 
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setViewMode("table")
-                                }
+                                onClick={() => setViewMode("table")}
                                 title="Vista de tabla"
                                 className={`
                                     flex h-9 w-10 items-center justify-center rounded-lg transition
@@ -395,9 +460,7 @@ function Users() {
 
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setViewMode("cards")
-                                }
+                                onClick={() => setViewMode("cards")}
                                 title="Vista de tarjetas"
                                 className={`
                                     flex h-9 w-10 items-center justify-center rounded-lg transition
@@ -458,9 +521,9 @@ function Users() {
 
                 </div>
 
-                {/* ==========================================
+                {/* ======================================================
                     LOADING
-                ========================================== */}
+                ====================================================== */}
 
                 {loading && (
 
@@ -476,29 +539,27 @@ function Users() {
 
                 )}
 
-                {/* ==========================================
+                {/* ======================================================
                     ERROR
-                ========================================== */}
+                ====================================================== */}
 
                 {error && !loading && (
 
-                    <div className="m-5 rounded-xl border border-red-200 bg-red-50 p-4">
+                    <div className="m-4 rounded-xl border border-red-200 bg-red-50 p-4 sm:m-5">
 
                         <div className="flex items-start gap-3">
 
-                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-red-600">
-
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 font-bold text-red-600">
                                 !
-
                             </div>
 
-                            <div>
+                            <div className="min-w-0">
 
                                 <p className="text-sm font-semibold text-red-800">
                                     No se pudieron cargar los usuarios
                                 </p>
 
-                                <p className="mt-1 text-sm text-red-700">
+                                <p className="mt-1 break-words text-sm text-red-700">
                                     {error}
                                 </p>
 
@@ -510,17 +571,17 @@ function Users() {
 
                 )}
 
-                {/* ==========================================
+                {/* ======================================================
                     CONTENIDO
-                ========================================== */}
+                ====================================================== */}
 
                 {!loading && !error && (
 
                     <>
 
-                        {/* ======================================
-                            VISTA TABLA
-                        ====================================== */}
+                        {/* ==================================================
+                            TABLA
+                        ================================================== */}
 
                         {viewMode === "table" && (
 
@@ -685,15 +746,15 @@ function Users() {
 
                         )}
 
-                        {/* ======================================
-                            VISTA CARDS
-                        ====================================== */}
+                        {/* ==================================================
+                            TARJETAS
+                        ================================================== */}
 
                         {viewMode === "cards" && (
 
-                            <div className="p-5">
+                            <div className="p-3 sm:p-5">
 
-                                {users.length > 0 ? (
+                                {users.length > 0 && (
 
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 
@@ -713,66 +774,19 @@ function Users() {
 
                                     </div>
 
-                                ) : null}
+                                )}
 
                             </div>
 
                         )}
 
-                        {/* ==========================================
+                        {/* ==================================================
                             SIN RESULTADOS
-                        ========================================== */}
+                        ================================================== */}
 
                         {users.length === 0 && (
 
-                            <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-
-                                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeWidth="1.6"
-                                        className="h-7 w-7"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
-                                        />
-
-                                        <circle
-                                            cx="9"
-                                            cy="7"
-                                            r="4"
-                                        />
-
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M22 21v-2a4 4 0 0 0-3-3.87"
-                                        />
-
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            d="M16 3.13a4 4 0 0 1 0 7.75"
-                                        />
-                                    </svg>
-
-                                </div>
-
-                                <h3 className="mt-4 text-sm font-semibold text-slate-900">
-                                    No se encontraron usuarios
-                                </h3>
-
-                                <p className="mt-1 max-w-sm text-sm text-slate-500">
-                                    No hay usuarios que coincidan con tu búsqueda.
-                                </p>
-
-                            </div>
+                            <EmptyState />
 
                         )}
 
@@ -782,9 +796,9 @@ function Users() {
 
             </div>
 
-            {/* ==========================================
+            {/* ======================================================
                 MODALES
-            ========================================== */}
+            ====================================================== */}
 
             <UserModal
                 isOpen={modalOpen}
@@ -825,17 +839,17 @@ function Users() {
 export default Users;
 
 
-// ======================================================
-// STATUS BADGE
-// ======================================================
+/*
+==========================================================
+STATUS BADGE
+==========================================================
+*/
 
 interface StatusBadgeProps {
     active: boolean;
 }
 
-function StatusBadge({
-    active
-}: StatusBadgeProps) {
+function StatusBadge({ active }: StatusBadgeProps) {
 
     if (active) {
         return (
@@ -861,9 +875,11 @@ function StatusBadge({
 }
 
 
-// ======================================================
-// ACTION BUTTONS
-// ======================================================
+/*
+==========================================================
+ACTION BUTTONS
+==========================================================
+*/
 
 interface ActionButtonsProps {
     user: User;
@@ -878,7 +894,7 @@ function ActionButtons({
     onView,
     onEdit,
     onToggle,
-    onDelete
+    onDelete,
 }: ActionButtonsProps) {
 
     return (
@@ -888,9 +904,19 @@ function ActionButtons({
             {/* VER */}
 
             <button
+                type="button"
                 onClick={() => onView(user)}
                 title="Ver usuario"
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Ver usuario"
+                className="
+                    rounded-lg
+                    p-2.5
+                    text-slate-400
+                    transition
+                    hover:bg-slate-100
+                    hover:text-slate-700
+                    active:bg-slate-200
+                "
             >
 
                 <svg
@@ -919,9 +945,19 @@ function ActionButtons({
             {/* EDITAR */}
 
             <button
+                type="button"
                 onClick={() => onEdit(user)}
                 title="Editar usuario"
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-blue-50 hover:text-blue-600"
+                aria-label="Editar usuario"
+                className="
+                    rounded-lg
+                    p-2.5
+                    text-slate-400
+                    transition
+                    hover:bg-blue-50
+                    hover:text-blue-600
+                    active:bg-blue-100
+                "
             >
 
                 <svg
@@ -950,16 +986,38 @@ function ActionButtons({
             {/* ACTIVAR / DESACTIVAR */}
 
             <button
+                type="button"
                 onClick={() => onToggle(user)}
                 title={
                     user.active
                         ? "Desactivar usuario"
                         : "Activar usuario"
                 }
+                aria-label={
+                    user.active
+                        ? "Desactivar usuario"
+                        : "Activar usuario"
+                }
                 className={
                     user.active
-                        ? "rounded-lg p-2 text-slate-400 transition hover:bg-amber-50 hover:text-amber-600"
-                        : "rounded-lg p-2 text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
+                        ? `
+                            rounded-lg
+                            p-2.5
+                            text-slate-400
+                            transition
+                            hover:bg-amber-50
+                            hover:text-amber-600
+                            active:bg-amber-100
+                        `
+                        : `
+                            rounded-lg
+                            p-2.5
+                            text-slate-400
+                            transition
+                            hover:bg-emerald-50
+                            hover:text-emerald-600
+                            active:bg-emerald-100
+                        `
                 }
             >
 
@@ -1016,9 +1074,19 @@ function ActionButtons({
             {/* ELIMINAR */}
 
             <button
+                type="button"
                 onClick={() => onDelete(user)}
                 title="Eliminar usuario"
-                className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                aria-label="Eliminar usuario"
+                className="
+                    rounded-lg
+                    p-2.5
+                    text-slate-400
+                    transition
+                    hover:bg-red-50
+                    hover:text-red-600
+                    active:bg-red-100
+                "
             >
 
                 <svg
@@ -1055,9 +1123,11 @@ function ActionButtons({
 }
 
 
-// ======================================================
-// USER CARD
-// ======================================================
+/*
+==========================================================
+USER CARD
+==========================================================
+*/
 
 interface UserCardProps {
     user: User;
@@ -1074,7 +1144,7 @@ function UserCard({
     onView,
     onEdit,
     onToggle,
-    onDelete
+    onDelete,
 }: UserCardProps) {
 
     const equipmentCount =
@@ -1082,48 +1152,55 @@ function UserCard({
 
     return (
 
-        <div className="
-            group
-            rounded-2xl
-            border
-            border-slate-200
-            bg-white
-            p-5
-            shadow-sm
-            transition
-            hover:-translate-y-0.5
-            hover:shadow-md
-        ">
+        <div
+            className="
+                group
+                rounded-2xl
+                border
+                border-slate-200
+                bg-white
+                p-4
+                shadow-sm
+                transition
+                hover:-translate-y-0.5
+                hover:shadow-md
+                sm:p-5
+            "
+        >
 
-            {/* ==========================================
+            {/* ======================================================
                 HEADER CARD
-            ========================================== */}
+            ====================================================== */}
 
             <div className="flex items-start justify-between gap-3">
 
                 <div className="flex min-w-0 items-center gap-3">
 
-                    <div className="
-                        flex
-                        h-12
-                        w-12
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-slate-100
-                        text-sm
-                        font-bold
-                        text-slate-700
-                        ring-1
-                        ring-slate-200
-                    ">
+                    <div
+                        className="
+                            flex
+                            h-11
+                            w-11
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-slate-100
+                            text-sm
+                            font-bold
+                            text-slate-700
+                            ring-1
+                            ring-slate-200
+                            sm:h-12
+                            sm:w-12
+                        "
+                    >
                         {getInitials(user.name)}
                     </div>
 
                     <div className="min-w-0">
 
-                        <h3 className="truncate text-sm font-bold text-slate-900">
+                        <h3 className="truncate text-sm font-bold text-slate-900 sm:text-base">
                             {user.name}
                         </h3>
 
@@ -1135,25 +1212,27 @@ function UserCard({
 
                 </div>
 
-                <StatusBadge active={user.active} />
+                <div className="shrink-0">
+                    <StatusBadge active={user.active} />
+                </div>
 
             </div>
 
-            {/* ==========================================
+            {/* ======================================================
                 INFORMACIÓN
-            ========================================== */}
+            ====================================================== */}
 
             <div className="mt-5 space-y-3">
 
                 {/* DEPARTAMENTO */}
 
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 
                     <span className="text-xs font-medium text-slate-400">
                         Departamento
                     </span>
 
-                    <span className="truncate text-right text-sm text-slate-700">
+                    <span className="break-words text-sm text-slate-700 sm:text-right">
                         {user.department || "Sin departamento"}
                     </span>
 
@@ -1161,13 +1240,13 @@ function UserCard({
 
                 {/* PUESTO */}
 
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 
                     <span className="text-xs font-medium text-slate-400">
                         Puesto
                     </span>
 
-                    <span className="truncate text-right text-sm text-slate-700">
+                    <span className="break-words text-sm text-slate-700 sm:text-right">
                         {user.position || "Sin puesto"}
                     </span>
 
@@ -1175,13 +1254,13 @@ function UserCard({
 
                 {/* JEFE */}
 
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
 
                     <span className="text-xs font-medium text-slate-400">
                         Jefe
                     </span>
 
-                    <span className="truncate text-right text-sm text-slate-700">
+                    <span className="break-words text-sm text-slate-700 sm:text-right">
                         {user.boss || "Sin jefe"}
                     </span>
 
@@ -1189,33 +1268,38 @@ function UserCard({
 
             </div>
 
-            {/* ==========================================
+            {/* ======================================================
                 EQUIPOS
-            ========================================== */}
+            ====================================================== */}
 
-            <div className="
-                mt-5
-                flex
-                items-center
-                justify-between
-                rounded-xl
-                bg-slate-50
-                px-4
-                py-3
-            ">
+            <div
+                className="
+                    mt-5
+                    flex
+                    items-center
+                    justify-between
+                    rounded-xl
+                    bg-slate-50
+                    px-4
+                    py-3
+                "
+            >
 
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 items-center gap-2">
 
-                    <div className="
-                        flex
-                        h-8
-                        w-8
-                        items-center
-                        justify-center
-                        rounded-lg
-                        bg-blue-50
-                        text-blue-600
-                    ">
+                    <div
+                        className="
+                            flex
+                            h-8
+                            w-8
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-lg
+                            bg-blue-50
+                            text-blue-600
+                        "
+                    >
 
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -1242,47 +1326,57 @@ function UserCard({
 
                     </div>
 
-                    <span className="text-sm font-medium text-slate-600">
+                    <span className="truncate text-sm font-medium text-slate-600">
                         Equipos asignados
                     </span>
 
                 </div>
 
-                <span className="
-                    inline-flex
-                    min-w-8
-                    items-center
-                    justify-center
-                    rounded-lg
-                    bg-blue-100
-                    px-2.5
-                    py-1
-                    text-xs
-                    font-bold
-                    text-blue-700
-                ">
+                <span
+                    className="
+                        inline-flex
+                        min-w-8
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-blue-100
+                        px-2.5
+                        py-1
+                        text-xs
+                        font-bold
+                        text-blue-700
+                    "
+                >
                     {equipmentCount}
                 </span>
 
             </div>
 
-            {/* ==========================================
+            {/* ======================================================
                 ACCIONES
-            ========================================== */}
+            ====================================================== */}
 
-            <div className="
-                mt-5
-                flex
-                items-center
-                justify-between
-                border-t
-                border-slate-100
-                pt-4
-            ">
+            <div
+                className="
+                    mt-5
+                    flex
+                    flex-col
+                    gap-3
+                    border-t
+                    border-slate-100
+                    pt-4
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                "
+            >
 
                 <button
+                    type="button"
                     onClick={() => onView(user)}
                     className="
+                        text-left
                         text-sm
                         font-medium
                         text-slate-600
@@ -1302,6 +1396,68 @@ function UserCard({
                 />
 
             </div>
+
+        </div>
+    );
+}
+
+
+/*
+==========================================================
+EMPTY STATE
+==========================================================
+*/
+
+function EmptyState() {
+
+    return (
+
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    className="h-7 w-7"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+                    />
+
+                    <circle
+                        cx="9"
+                        cy="7"
+                        r="4"
+                    />
+
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M22 21v-2a4 4 0 0 0-3-3.87"
+                    />
+
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M16 3.13a4 4 0 0 1 0 7.75"
+                    />
+                </svg>
+
+            </div>
+
+            <h3 className="mt-4 text-sm font-semibold text-slate-900">
+                No se encontraron usuarios
+            </h3>
+
+            <p className="mt-1 max-w-sm text-sm text-slate-500">
+                No hay usuarios que coincidan con tu búsqueda.
+            </p>
 
         </div>
     );

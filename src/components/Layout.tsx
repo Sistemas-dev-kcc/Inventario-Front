@@ -1,21 +1,45 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 
 function Layout() {
-  return (
-    <div className="min-h-screen bg-gray-100 flex">
-      <Sidebar />
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
-      <div className="flex-1 min-w-0">
-        <Header />
+    return (
+        <div className="min-h-screen bg-gray-100">
 
-        <main>
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  );
+            {/* SIDEBAR */}
+            <Sidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+            />
+
+            {/* CONTENIDO */}
+            <div className="min-h-screen md:ml-64">
+
+                <Header
+                    onMenuClick={() => setSidebarOpen(true)}
+                />
+
+                <main>
+                    <Outlet />
+                </main>
+
+            </div>
+
+            {/* OVERLAY MÓVIL */}
+            {sidebarOpen && (
+                <button
+                    type="button"
+                    aria-label="Cerrar menú"
+                    onClick={() => setSidebarOpen(false)}
+                    className="fixed inset-0 z-40 bg-black/40 md:hidden"
+                />
+            )}
+
+        </div>
+    );
 }
 
 export default Layout;
