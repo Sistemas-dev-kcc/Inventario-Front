@@ -1316,7 +1316,7 @@ function EquipmentModal({
 // ==================================================
 
 function clearFieldError(
-  field: string
+  _field: string
 ) {
 
   // Esta función se utiliza desde los
