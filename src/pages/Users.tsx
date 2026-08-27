@@ -609,7 +609,7 @@ function Users() {
                         Estado
                       </th>
 
-                      <th className="px-6 py-4 text-right text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                      <th className="px-6 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                         Acciones
                       </th>
                     </tr>
@@ -695,7 +695,7 @@ function Users() {
                     ========================================== */}
 
                           <td className="px-6 py-4">
-                            <div className="flex justify-end">
+                            <div className="flex justify-center">
                               <ActionButtons
                                 user={user}
                                 onView={handleViewUser}
@@ -837,7 +837,7 @@ function ActionButtons({
   onDelete,
 }: ActionButtonsProps) {
   return (
-    <div className="flex items-center justify-end gap-1">
+    <div className="flex gap-1 ">
       {/* VER */}
 
       <button
