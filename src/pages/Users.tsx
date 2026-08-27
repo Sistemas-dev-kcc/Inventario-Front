@@ -74,7 +74,13 @@ function Users() {
 
       const data = await api<User[]>("/users");
 
-      setUsers(data);
+      setUsers(
+        [...data].sort((a, b) =>
+          a.name.localeCompare(b.name, "es", {
+            sensitivity: "base",
+          }),
+        ),
+      );
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Error al cargar usuarios",
@@ -173,7 +179,13 @@ function Users() {
 
       const data = await api<User[]>(endpoint);
 
-      setUsers(data);
+      setUsers(
+        [...data].sort((a, b) =>
+          a.name.localeCompare(b.name, "es", {
+            sensitivity: "base",
+          }),
+        ),
+      );
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "Error al buscar usuarios",

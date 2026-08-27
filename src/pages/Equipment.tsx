@@ -5,7 +5,6 @@ import type {
   Equipment as EquipmentType,
   EquipmentStatus,
   EquipmentType as EquipmentTypeEnum,
-  Equipment,
 } from "../types";
 
 import EquipmentModal from "../components/EquipmentModal";
@@ -20,7 +19,7 @@ function Equipment() {
   const [status, setStatus] = useState("");
   const [type, setType] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [equipmentToDelete, setEquipmentToDelete] = useState<Equipment | null>(null);
+  const [equipmentToDelete, setEquipmentToDelete] = useState<EquipmentType | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -149,7 +148,7 @@ function Equipment() {
   // ELIMINAR
   // ======================================================
 
-  function handleDeleteClick(equipment: Equipment) {
+  function handleDeleteClick(equipment: EquipmentType) {
     setEquipmentToDelete(equipment);
     setDeleteError("");
     setConfirmOpen(true);
