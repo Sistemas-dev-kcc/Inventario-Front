@@ -91,15 +91,15 @@ function Dashboard() {
   const assignedPercentage =
     data.equipment.total > 0
       ? Math.round(
-          (data.equipment.assigned / data.equipment.total) * 100
-        )
+        (data.equipment.assigned / data.equipment.total) * 100
+      )
       : 0;
 
   const warehousePercentage =
     data.equipment.total > 0
       ? Math.round(
-          (data.equipment.warehouse / data.equipment.total) * 100
-        )
+        (data.equipment.warehouse / data.equipment.total) * 100
+      )
       : 0;
 
   // ==========================================
@@ -192,7 +192,7 @@ function Dashboard() {
             description="Estado actual del inventario"
           />
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               title="Total"
               value={data.equipment.total}
@@ -217,6 +217,15 @@ function Dashboard() {
               description={`${warehousePercentage}% del inventario`}
               iconClass="bg-purple-50 text-purple-600"
               valueClass="text-purple-700"
+            />
+
+            <StatCard
+              title="Baja"
+              value={data.equipment.retired}
+              icon={<TrashIcon />}
+              description="Equipos dados de baja"
+              iconClass="bg-red-50 text-red-600"
+              valueClass="text-red-700"
             />
           </div>
 
@@ -690,6 +699,43 @@ function BoxIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
         d="M12 12v9"
+      />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-5 w-5"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 7h16"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M10 11v6M14 11v6"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 7l1 14h10l1-14"
+      />
+
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M9 7V4h6v3"
       />
     </svg>
   );

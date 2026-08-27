@@ -17,19 +17,19 @@ interface UserForm {
 }
 
 const departments = [
-  "AYB",
-  "CONTABILIDAD",
-  "DIVISION_CUARTOS",
-  "E_COMMERCE",
-  "GERENCIA",
-  "MANTENIMIENTO",
-  "NOMINAS",
-  "RECEPCION",
-  "RECURSOS_HUMANOS",
-  "SISTEMAS",
-  "TELEFONOS",
-  "TIEMPO_COMPARTIDO",
-  "VENTAS"
+  "AyB",
+  "Contabilidad",
+  "Division Cuartos",
+  "E Commerce",
+  "Gerencia",
+  "Mantenimiento",
+  "Nominas",
+  "Recepcion",
+  "Recursos Humanos",
+  "Sistemas",
+  "Telefono",
+  "Tiempo Compartido",
+  "Ventas"
 ];
 
 const emptyForm: UserForm = {
