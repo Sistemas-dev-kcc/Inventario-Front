@@ -70,7 +70,7 @@ const emptyForm: EquipmentForm = {
 
   model: "",
 
-  type: "LAPTOP",
+  type: "PC",
 
   teamviewer: "",
 
@@ -1030,12 +1030,28 @@ function EquipmentModal({
                         "Seleccionar memoria"
                     },
                     {
-                      value: "500 GB SSD",
-                      label: "500 GB SSD"
+                      value: "128 GB SSD",
+                      label: "128 GB SSD"
                     },
                     {
-                      value: "500 GB HDD",
-                      label: "500 GB HDD"
+                      value: "128 GB HDD",
+                      label: "128 GB HDD"
+                    },
+                    {
+                      value: "256 GB SSD",
+                      label: "256 GB SSD"
+                    },
+                    {
+                      value: "256 GB HDD",
+                      label: "256 GB HDD"
+                    },
+                    {
+                      value: "512 GB SSD",
+                      label: "512 GB SSD"
+                    },
+                    {
+                      value: "512 GB HDD",
+                      label: "512 GB HDD"
                     },
                     {
                       value: "1 TB SSD",

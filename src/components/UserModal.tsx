@@ -27,7 +27,7 @@ const departments = [
   "Recepcion",
   "Recursos Humanos",
   "Sistemas",
-  "Telefono",
+  "Telefonos",
   "Tiempo Compartido",
   "Ventas"
 ];
